@@ -41,7 +41,7 @@ namespace AspectInjector.Tests.Advices
         }
     }
 
-    [Aspect(typeof(GenericTests_Aspect))]
+    [Inject(typeof(GenericTests_Aspect))]
     internal class GenericTests_Target<T>
     {
         public void TestMethod()
@@ -53,18 +53,18 @@ namespace AspectInjector.Tests.Advices
         }
     }
 
+    [Aspect(Aspect.Scope.Global)]
     internal class GenericTests_Aspect
     {
-        [Advice(InjectionPoints.Before, InjectionTargets.Method)]
+        [Advice(Advice.Type.Before, Advice.Target.Method)]
         public void BeforeMethod() { Checker.Passed = true; }
     }
 
     internal class GenericTests_OpenGenericTargetBase<T, U>
     {
-
     }
 
-    [Aspect(typeof(GenericTests_OpenGenericAspect))]
+    [Inject(typeof(GenericTests_OpenGenericAspect))]
     internal class GenericTests_OpenGenericTarget<U, V> :
         GenericTests_OpenGenericTargetBase<string, U>
     {
@@ -73,9 +73,10 @@ namespace AspectInjector.Tests.Advices
         }
     }
 
+    [Aspect(Aspect.Scope.Global)]
     internal class GenericTests_OpenGenericAspect
     {
-        [Advice(InjectionPoints.Before, InjectionTargets.Method)]
+        [Advice(Advice.Type.Before, Advice.Target.Method)]
         public void BeforeMethod() { Checker.Passed = true; }
     }
 }

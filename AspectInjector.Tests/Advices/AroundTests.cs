@@ -50,7 +50,7 @@ namespace AspectInjector.Tests.Advices
             Checker.Passed = true;
             new AroundTests_ArgumentsModificationTarget().TestMethod(ref i);
             Assert.IsTrue(Checker.Passed);
-        } 
+        }
 
         [TestMethod, Ignore]
         public void Advices_InjectAroundMethod_NoWrapperInStackTrace()
@@ -73,8 +73,8 @@ namespace AspectInjector.Tests.Advices
 
         internal class AroundTests_Target
         {
-            [Aspect(typeof(AroundTests_Aspect1))]
-            [Aspect(typeof(AroundTests_Aspect2))] //fire first
+            [Inject(typeof(AroundTests_Aspect1))]
+            [Inject(typeof(AroundTests_Aspect2))] //fire first
             public object Do2(object data, int value, ref object testRef, out object testOut, ref int testRefValue, out int testOutValue, bool passed, bool passed2)
             {
                 Checker.Passed = passed && passed2;
@@ -85,8 +85,8 @@ namespace AspectInjector.Tests.Advices
                 return new object();
             }
 
-            [Aspect(typeof(AroundTests_Aspect1))]
-            [Aspect(typeof(AroundTests_Aspect2))] //fire first
+            [Inject(typeof(AroundTests_Aspect1))]
+            [Inject(typeof(AroundTests_Aspect2))] //fire first
             public int Do1(object data, int value, ref object testRef, out object testOut, ref int testRefValue, out int testOutValue, bool passed, bool passed2)
             {
                 Checker.Passed = passed && passed2;
@@ -98,21 +98,23 @@ namespace AspectInjector.Tests.Advices
             }
         }
 
+        [Aspect(Aspect.Scope.Global)]
         internal class AroundTests_Aspect1
         {
-            [Advice(InjectionPoints.Around, InjectionTargets.Method)]
-            public object AroundMethod([AdviceArgument(AdviceArgumentSource.Target)] Func<object[], object> target,
-                [AdviceArgument(AdviceArgumentSource.Arguments)] object[] arguments)
+            [Advice(Advice.Type.Around, Advice.Target.Method)]
+            public object AroundMethod([Advice.Argument(Advice.Argument.Source.Target)] Func<object[], object> target,
+                [Advice.Argument(Advice.Argument.Source.Arguments)] object[] arguments)
             {
                 return target(new object[] { arguments[0], arguments[1], arguments[2], arguments[3], arguments[4], arguments[5], true, arguments[7] });
             }
         }
 
+        [Aspect(Aspect.Scope.Global)]
         internal class AroundTests_Aspect2
         {
-            [Advice(InjectionPoints.Around, InjectionTargets.Method)]
-            public object AroundMethod([AdviceArgument(AdviceArgumentSource.Target)] Func<object[], object> target,
-                [AdviceArgument(AdviceArgumentSource.Arguments)] object[] arguments)
+            [Advice(Advice.Type.Around, Advice.Target.Method)]
+            public object AroundMethod([Advice.Argument(Advice.Argument.Source.Target)] Func<object[], object> target,
+                [Advice.Argument(Advice.Argument.Source.Arguments)] object[] arguments)
             {
                 return target(new object[] { arguments[0], arguments[1], arguments[2], arguments[3], arguments[4], arguments[5], arguments[6], true });
             }
@@ -120,7 +122,7 @@ namespace AspectInjector.Tests.Advices
 
         internal class AroundTests_ArgumentsModificationTarget
         {
-            [Aspect(typeof(AroundTests_ArgumentsModificationAspect))]
+            [Inject(typeof(AroundTests_ArgumentsModificationAspect))]
             public void TestMethod(ref int i)
             {
                 if (i == 2)
@@ -128,12 +130,13 @@ namespace AspectInjector.Tests.Advices
             }
         }
 
+        [Aspect(Aspect.Scope.Global)]
         internal class AroundTests_ArgumentsModificationAspect
         {
-            [Advice(InjectionPoints.Around, InjectionTargets.Method)]
+            [Advice(Advice.Type.Around, Advice.Target.Method)]
             public object AroundMethod(
-                [AdviceArgument(AdviceArgumentSource.Arguments)] object[] args,
-                [AdviceArgument(AdviceArgumentSource.Target)] Func<object[], object> target
+                [Advice.Argument(Advice.Argument.Source.Arguments)] object[] args,
+                [Advice.Argument(Advice.Argument.Source.Target)] Func<object[], object> target
                 )
             {
                 args[0] = 2;
@@ -148,18 +151,19 @@ namespace AspectInjector.Tests.Advices
 
         internal class AroundTests_StackTraceTarget
         {
-            [Aspect(typeof(AroundTests_StackTraceAspect))]
+            [Inject(typeof(AroundTests_StackTraceAspect))]
             public void Do()
             {
                 throw new Exception("Test Exception");
             }
         }
 
+        [Aspect(Aspect.Scope.Global)]
         public class AroundTests_StackTraceAspect
         {
-            [Advice(InjectionPoints.Around, InjectionTargets.Method)]
-            public object AroundMethod([AdviceArgument(AdviceArgumentSource.Target)] Func<object[], object> target,
-                [AdviceArgument(AdviceArgumentSource.Arguments)] object[] arguments)
+            [Advice(Advice.Type.Around, Advice.Target.Method)]
+            public object AroundMethod([Advice.Argument(Advice.Argument.Source.Target)] Func<object[], object> target,
+                [Advice.Argument(Advice.Argument.Source.Arguments)] object[] arguments)
             {
                 return target(arguments);
             }

@@ -35,14 +35,14 @@
 //    {
 //        private int _counter;
 
-//        [Advice(InjectionPoints.Before, InjectionTargets.Method)]
+//        [Advice(Advice.Type.Before, Advice.Target.Method)]
 //        public void IncrementCounter()
 //        {
 //            _counter++;
 //        }
 
-//        [Advice(InjectionPoints.Before, InjectionTargets.Getter)]
-//        public int GetCounter([AdviceArgument(AdviceArgumentSource.AbortFlag)] ref bool abort)
+//        [Advice(Advice.Type.Before, Advice.Target.Getter)]
+//        public int GetCounter([Advice.Argument(Advice.Argument.Source.AbortFlag)] ref bool abort)
 //        {
 //            abort = true;
 //            return _counter;
@@ -54,21 +54,21 @@
 //    {
 //        private int _counter;
 
-//        [Advice(InjectionPoints.Before, InjectionTargets.Method)]
+//        [Advice(Advice.Type.Before, Advice.Target.Method)]
 //        public void IncrementCounter()
 //        {
 //            _counter++;
 //        }
 
-//        [Advice(InjectionPoints.Before, InjectionTargets.Getter)]
-//        public int GetCounter([AdviceArgument(AdviceArgumentSource.AbortFlag)] ref bool abort)
+//        [Advice(Advice.Type.Before, Advice.Target.Getter)]
+//        public int GetCounter([Advice.Argument(Advice.Argument.Source.AbortFlag)] ref bool abort)
 //        {
 //            abort = true;
 //            return _counter;
 //        }
 //    }
 
-//    [Aspect(typeof(AspectScopeTests_PerInstanceAspect))]
+//    [Inject(typeof(AspectScopeTests_PerInstanceAspect))]
 //    internal class AspectScopeTests_PerInstanceTarget
 //    {
 //        public int Counter
@@ -81,7 +81,7 @@
 //        }
 //    }
 
-//    [Aspect(typeof(AspectScopeTests_PerTypeAspect))]
+//    [Inject(typeof(AspectScopeTests_PerTypeAspect))]
 //    internal class AspectScopeTests_PerTypeTarget
 //    {
 //        public int Counter

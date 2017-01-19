@@ -5,7 +5,7 @@ namespace AspectInjector.BuildTask.Validation
 {
     internal class ValidationRule
     {
-        public AdviceArgumentSource Source { get; set; }
+        public Advice.Argument.Source Source { get; set; }
 
         public Type ShouldBeOfType { get; set; }
 

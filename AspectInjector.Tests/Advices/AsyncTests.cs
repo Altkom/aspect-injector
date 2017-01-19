@@ -61,7 +61,7 @@ namespace AspectInjector.Tests.Advices
 
     public class AsyncTests_Target
     {
-        [Aspect(typeof(AsyncTests_SimpleAspect))]
+        [Inject(typeof(AsyncTests_SimpleAspect))]
         public async Task Do()
         {
             await Task.Delay(1);
@@ -69,7 +69,7 @@ namespace AspectInjector.Tests.Advices
             AsyncTests.Data = true;
         }
 
-        [Aspect(typeof(AsyncTests_SimpleAspect))]
+        [Inject(typeof(AsyncTests_SimpleAspect))]
         public async Task<string> Do2()
         {
             await Task.Delay(1);
@@ -79,7 +79,7 @@ namespace AspectInjector.Tests.Advices
             return "test";
         }
 
-        [Aspect(typeof(AsyncTests_SimpleAspect))]
+        [Inject(typeof(AsyncTests_SimpleAspect))]
         public async void Do3()
         {
             await Task.Delay(1);
@@ -87,7 +87,7 @@ namespace AspectInjector.Tests.Advices
             AsyncTests.Data = true;
         }
 
-        [Aspect(typeof(AsyncTests_ArgumentsAspect))]
+        [Inject(typeof(AsyncTests_ArgumentsAspect))]
         public async Task<string> Do4(string testData)
         {
             await Task.Delay(1);
@@ -97,22 +97,24 @@ namespace AspectInjector.Tests.Advices
             return testData;
         }
 
+        [Aspect(Aspect.Scope.Global)]
         public class AsyncTests_ArgumentsAspect
         {
-            [Advice(InjectionPoints.After, InjectionTargets.Method)]
-            public void AfterMethod([AdviceArgument(AdviceArgumentSource.ReturnValue)] object value,
-                [AdviceArgument(AdviceArgumentSource.Arguments)] object[] args
+            [Advice(Advice.Type.After, Advice.Target.Method)]
+            public void AfterMethod([Advice.Argument(Advice.Argument.Source.ReturnValue)] object value,
+                [Advice.Argument(Advice.Argument.Source.Arguments)] object[] args
                 )
             {
                 Checker.Passed = args[0].ToString() == "args_test";
             }
         }
 
+        [Aspect(Aspect.Scope.Global)]
         public class AsyncTests_SimpleAspect
         {
-            [Advice(InjectionPoints.After, InjectionTargets.Method)]
-            public void AfterMethod([AdviceArgument(AdviceArgumentSource.ReturnValue)] object value,
-                [AdviceArgument(AdviceArgumentSource.Arguments)] object[] args
+            [Advice(Advice.Type.After, Advice.Target.Method)]
+            public void AfterMethod([Advice.Argument(Advice.Argument.Source.ReturnValue)] object value,
+                [Advice.Argument(Advice.Argument.Source.Arguments)] object[] args
                 )
             {
                 Checker.Passed = AsyncTests.Data;

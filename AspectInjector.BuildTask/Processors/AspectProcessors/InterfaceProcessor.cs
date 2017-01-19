@@ -19,13 +19,13 @@ namespace AspectInjector.BuildTask.Processors.AspectProcessors
 
         public bool CanProcess(TypeDefinition aspectType)
         {
-            return aspectType.CustomAttributes.HasAttributeOfType<AdviceInterfaceProxyAttribute>();
+            return aspectType.CustomAttributes.HasAttributeOfType<Mixin>();
         }
 
         public void Process(AspectContext context)
         {
             var interfaceInjectionDefinitions = from ca in context.AdviceClassType.CustomAttributes
-                                                where ca.IsAttributeOfType<AdviceInterfaceProxyAttribute>()
+                                                where ca.IsAttributeOfType<Mixin>()
                                                 select new { @interface = (TypeReference)ca.ConstructorArguments[0].Value };
 
             foreach (var interfaceInjectionDefinition in interfaceInjectionDefinitions)

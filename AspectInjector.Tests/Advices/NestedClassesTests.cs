@@ -15,19 +15,19 @@ namespace AspectInjector.Tests.Advices
             Assert.IsTrue(Checker.Passed);
         }
 
-        [Aspect(typeof(NestedClassesTests_Aspect))]
+        [Inject(typeof(NestedClassesTests_Aspect))]
         private class NestedClassesTests_Target
         {
             public void Do()
             {
-
             }
         }
     }
 
+    [Aspect(Aspect.Scope.Global)]
     public class NestedClassesTests_Aspect
     {
-        [AdviceAttribute(InjectionPoints.Before, InjectionTargets.Method)]
+        [Advice(Advice.Type.Before, Advice.Target.Method)]
         public void TestMethod()
         {
             Checker.Passed = true;

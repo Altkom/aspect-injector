@@ -91,13 +91,13 @@ namespace AspectInjector.BuildTask.Contexts
             FieldAttributes fieldAttrs;
             string aspectPropertyName = null;
 
-            if (info.AdviceClassScope == AspectScope.Instance)
+            if (info.AdviceClassScope == Aspect.Scope.Instance)
             {
                 fieldAttrs = FieldAttributes.Private;
                 initMethod = InstanсeAspectsInitializer;
                 aspectPropertyName = AspectInstancePropertyNamePrefix + info.AdviceClassType.Name;
             }
-            else if (info.AdviceClassScope == AspectScope.Type)
+            else if (info.AdviceClassScope == Aspect.Scope.Global)
             {
                 fieldAttrs = FieldAttributes.Private | FieldAttributes.Static;
                 initMethod = TypeAspectsInitializer;

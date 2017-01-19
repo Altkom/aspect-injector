@@ -18,10 +18,10 @@ namespace AspectInjector.Tests.Interfaces
             Assert.AreEqual(r1, r2);
         }
 
-        [Aspect(typeof(InheritanceTests_Aspect))]
+        [Inject(typeof(InheritanceTests_Aspect))]
         public class InheritanceTests_Base { }
 
-        [Aspect(typeof(InheritanceTests_Aspect))]
+        [Inject(typeof(InheritanceTests_Aspect))]
         public class InheritanceTests_Target : InheritanceTests_Base { }
 
         public interface IInheritanceTests
@@ -31,7 +31,8 @@ namespace AspectInjector.Tests.Interfaces
             int GetAspectHash();
         }
 
-        [AdviceInterfaceProxy(typeof(IInheritanceTests))]
+        [Mixin(typeof(IInheritanceTests))]
+        [Aspect(Aspect.Scope.Global)]
         public class InheritanceTests_Aspect : IInheritanceTests
         {
             public string GetAspectType()

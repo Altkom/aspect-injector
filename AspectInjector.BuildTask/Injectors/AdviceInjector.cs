@@ -22,15 +22,15 @@ namespace AspectInjector.BuildTask.Injectors
 
             switch (context.InjectionPoint)
             {
-                case InjectionPoints.Before:
+                case Advice.Type.Before:
                     injectionPoint = context.AspectContext.TargetMethodContext.EntryPoint;
                     break;
 
-                case InjectionPoints.After:
+                case Advice.Type.After:
                     injectionPoint = context.AspectContext.TargetMethodContext.ReturnPoint;
                     break;
 
-                case InjectionPoints.Around:
+                case Advice.Type.Around:
                     injectionPoint = context.AspectContext.TargetMethodContext.CreateNewAroundPoint();
                     break;
 
@@ -49,45 +49,41 @@ namespace AspectInjector.BuildTask.Injectors
 
         protected IEnumerable<object> ResolveArgumentsValues(
            AspectContext context,
-           List<AdviceArgumentSource> sources)
+           List<Advice.Argument.Source> sources)
         {
             foreach (var argumentSource in sources)
             {
                 switch (argumentSource)
                 {
-                    case AdviceArgumentSource.Instance:
+                    case Advice.Argument.Source.Instance:
                         yield return context.TargetMethodContext.TargetMethod.IsStatic ? Markers.DefaultMarker : Markers.InstanceSelfMarker;
                         break;
 
-                    case AdviceArgumentSource.Type:
+                    case Advice.Argument.Source.Type:
                         yield return context.TargetTypeContext.TypeDefinition;
                         break;
 
-                    case AdviceArgumentSource.Method:
+                    case Advice.Argument.Source.Method:
                         yield return context.TargetMethodContext.TopWrapper ?? context.TargetMethodContext.TargetMethod;
                         break;
 
-                    case AdviceArgumentSource.Arguments:
+                    case Advice.Argument.Source.Arguments:
                         yield return Markers.AllArgsMarker;
                         break;
 
-                    case AdviceArgumentSource.Name:
+                    case Advice.Argument.Source.Name:
                         yield return context.TargetName;
                         break;
 
-                    case AdviceArgumentSource.ReturnType:
+                    case Advice.Argument.Source.ReturnType:
                         yield return context.TargetMethodContext.TargetMethod.ReturnType;
                         break;
 
-                    case AdviceArgumentSource.ReturnValue:
+                    case Advice.Argument.Source.ReturnValue:
                         yield return context.TargetMethodContext.MethodResultVariable ?? Markers.DefaultMarker;
                         break;
 
-                    case AdviceArgumentSource.RoutableData:
-                        yield return context.AspectRoutableData ?? Markers.DefaultMarker;
-                        break;
-
-                    case AdviceArgumentSource.Target:
+                    case Advice.Argument.Source.Target:
                         yield return Markers.TargetFuncMarker;
                         break;
 

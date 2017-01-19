@@ -7,6 +7,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+using AspectInjector.BuildTask.Models;
 
 namespace AspectInjector.BuildTask.Validation
 {
@@ -18,15 +19,14 @@ namespace AspectInjector.BuildTask.Validation
 
         static Validator()
         {
-            _rules.Add(new ValidationRule() { Source = AdviceArgumentSource.Instance, ShouldBeOfType = typeof(object) });
-            _rules.Add(new ValidationRule() { Source = AdviceArgumentSource.Target, ShouldBeOfType = typeof(Func<object[], object>) });
-            _rules.Add(new ValidationRule() { Source = AdviceArgumentSource.Type, ShouldBeOfType = typeof(Type) });
-            _rules.Add(new ValidationRule() { Source = AdviceArgumentSource.ReturnType, ShouldBeOfType = typeof(Type) });
-            _rules.Add(new ValidationRule() { Source = AdviceArgumentSource.Method, ShouldBeOfType = typeof(MethodBase) });
-            _rules.Add(new ValidationRule() { Source = AdviceArgumentSource.Arguments, ShouldBeOfType = typeof(object[]) });
-            _rules.Add(new ValidationRule() { Source = AdviceArgumentSource.RoutableData, ShouldBeOfType = typeof(Attribute[]) });
-            _rules.Add(new ValidationRule() { Source = AdviceArgumentSource.Name, ShouldBeOfType = typeof(string) });
-            _rules.Add(new ValidationRule() { Source = AdviceArgumentSource.ReturnValue, ShouldBeOfType = typeof(object) });
+            _rules.Add(new ValidationRule() { Source = Advice.Argument.Source.Instance, ShouldBeOfType = typeof(object) });
+            _rules.Add(new ValidationRule() { Source = Advice.Argument.Source.Target, ShouldBeOfType = typeof(Func<object[], object>) });
+            _rules.Add(new ValidationRule() { Source = Advice.Argument.Source.Type, ShouldBeOfType = typeof(Type) });
+            _rules.Add(new ValidationRule() { Source = Advice.Argument.Source.ReturnType, ShouldBeOfType = typeof(Type) });
+            _rules.Add(new ValidationRule() { Source = Advice.Argument.Source.Method, ShouldBeOfType = typeof(MethodBase) });
+            _rules.Add(new ValidationRule() { Source = Advice.Argument.Source.Arguments, ShouldBeOfType = typeof(object[]) });
+            _rules.Add(new ValidationRule() { Source = Advice.Argument.Source.Name, ShouldBeOfType = typeof(string) });
+            _rules.Add(new ValidationRule() { Source = Advice.Argument.Source.ReturnValue, ShouldBeOfType = typeof(object) });
         }
 
         public static void ValidateCustomAspectDefinition(CustomAttribute attribute)
@@ -36,18 +36,31 @@ namespace AspectInjector.BuildTask.Validation
 
         public static void ValidateAdviceMethodParameter(ParameterDefinition parameter, MethodReference adviceMethod)
         {
-            var argumentAttribute = parameter.CustomAttributes.GetAttributeOfType<AdviceArgumentAttribute>();
+            var argumentAttribute = parameter.CustomAttributes.GetAttributeOfType<Advice.Argument>();
             if (argumentAttribute == null)
                 throw new CompilationException("Unbound advice arguments are not supported", adviceMethod);
 
-            var source = (AdviceArgumentSource)argumentAttribute.ConstructorArguments[0].Value;
+            var source = (Advice.Argument.Source)argumentAttribute.ConstructorArguments[0].Value;
 
             var rule = _rules.FirstOrDefault(r => r.Source == source);
             if (rule != null)
             {
                 if (!parameter.ParameterType.IsTypeOf(rule.ShouldBeOfType))
-                    throw new CompilationException("Argument should be of type " + rule.ShouldBeOfType.Namespace + "." + rule.ShouldBeOfType.Name + " to inject AdviceArgumentSource." + source.ToString(), adviceMethod);
+                    throw new CompilationException("Argument should be of type " + rule.ShouldBeOfType.Namespace + "." + rule.ShouldBeOfType.Name + " to inject Advice.Argument.Source." + source.ToString(), adviceMethod);
             }
+        }
+
+        internal static void ValidateAspectDefinitions(IEnumerable<InjectionStatement> allAspectDefinitions, TypeReference refer)
+        {
+            if (refer is GenericInstanceType)
+                throw new CompilationException($"Generic types as targets are not supported.", refer);
+
+            if (refer.HasGenericParameters)
+                throw new CompilationException($"Generic types as targets are not supported.", refer);
+
+            foreach (var injections in allAspectDefinitions)
+                if (!injections.AdviceClassType.CustomAttributes.HasAttributeOfType<Aspect>())
+                    throw new CompilationException($"Cannot inject something which is not an aspect. Consider mark {injections.AdviceClassType.FullName} with [Aspect] attribute.", refer);
         }
 
         internal static void ValidateAdviceMethod(MethodDefinition adviceMethod)
@@ -56,27 +69,27 @@ namespace AspectInjector.BuildTask.Validation
                 throw new CompilationException("Advice cannot be generic", adviceMethod);
         }
 
-        internal static void ValidateAdviceInjectionContext(Contexts.AdviceInjectionContext context, InjectionTargets target)
+        internal static void ValidateAdviceInjectionContext(Contexts.AdviceInjectionContext context, Advice.Target target)
         {
-            //if (target == InjectionTargets.Constructor)
+            //if (target == Advice.Target.Constructor)
             //{
             //    if (!context.AdviceMethod.ReturnType.IsTypeOf(typeof(void)))
-            //        throw new CompilationException("Advice of InjectionTargets.Constructor can be System.Void only", context.AdviceMethod);
+            //        throw new CompilationException("Advice of Advice.Target.Constructor can be System.Void only", context.AdviceMethod);
             //}
 
-            if (context.InjectionPoint == InjectionPoints.After || context.InjectionPoint == InjectionPoints.Before)
+            if (context.InjectionPoint == Advice.Type.After || context.InjectionPoint == Advice.Type.Before)
             {
                 if (!context.AdviceMethod.ReturnType.IsTypeOf(typeof(void)))
-                    throw new CompilationException("Advice of InjectionPoints." + context.InjectionPoint.ToString() + " can be System.Void only", context.AdviceMethod);
+                    throw new CompilationException("Advice of Advice.Type." + context.InjectionPoint.ToString() + " can be System.Void only", context.AdviceMethod);
             }
 
-            if (context.InjectionPoint == InjectionPoints.Around)
+            if (context.InjectionPoint == Advice.Type.Around)
             {
-                if ((target & InjectionTargets.Constructor) == InjectionTargets.Constructor)
-                    throw new CompilationException("Advice of InjectionPoints." + context.InjectionPoint.ToString() + " can't be applied to constructors", context.AdviceMethod);
+                if ((target & Advice.Target.Constructor) == Advice.Target.Constructor)
+                    throw new CompilationException("Advice of Advice.Type." + context.InjectionPoint.ToString() + " can't be applied to constructors", context.AdviceMethod);
 
                 if (!context.AdviceMethod.ReturnType.IsTypeOf(typeof(object)))
-                    throw new CompilationException("Advice of InjectionPoints." + context.InjectionPoint.ToString() + " should return System.Object", context.AdviceMethod);
+                    throw new CompilationException("Advice of Advice.Type." + context.InjectionPoint.ToString() + " should return System.Object", context.AdviceMethod);
             }
         }
 
@@ -90,13 +103,8 @@ namespace AspectInjector.BuildTask.Validation
         {
             foreach (var context in contexts)
             {
-                var aspectFactories = context.AdviceClassType.Methods.Where(m => m.IsStatic && !m.IsConstructor && m.CustomAttributes.HasAttributeOfType<AspectFactoryAttribute>()).ToList();
-
-                if (aspectFactories.Count > 1)
-                    throw new CompilationException("Only one method can be AspectFactory", aspectFactories.Last());
-
                 if (context.AdviceClassFactory == null)
-                    throw new CompilationException("Cannot find either empty constructor or factory for aspect.", context.AdviceClassType);
+                    throw new CompilationException("Cannot found empty constructor for aspect.", context.AdviceClassType);
             }
         }
     }

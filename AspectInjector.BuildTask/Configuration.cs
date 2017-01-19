@@ -24,6 +24,8 @@ namespace AspectInjector.BuildTask
                         new InterfaceProcessor(new InterfaceInjector())
                     }),
 
+                    new MetadataWriterProcessor(),
+
                     new Janitor()
                 };
             }

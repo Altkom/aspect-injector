@@ -23,9 +23,9 @@ namespace AspectInjector.Tests.Advices
         }
     }
 
-    [Aspect(typeof(OrderTests_Aspect1))]
-    [Aspect(typeof(OrderTests_Aspect2))]
-    [Aspect(typeof(OrderTests_Aspect3))]
+    [Inject(typeof(OrderTests_Aspect1))]
+    [Inject(typeof(OrderTests_Aspect2))]
+    [Inject(typeof(OrderTests_Aspect3))]
     internal class OrderTests_Target
     {
         public void TestMethod()
@@ -33,26 +33,29 @@ namespace AspectInjector.Tests.Advices
         }
     }
 
+    [Aspect(Aspect.Scope.Global)]
     internal class OrderTests_Aspect1
     {
-        [Advice(InjectionPoints.Before, InjectionTargets.Method)]
+        [Advice(Advice.Type.Before, Advice.Target.Method)]
         public void BeforeMethod()
         {
         }
     }
 
+    [Aspect(Aspect.Scope.Global)]
     internal class OrderTests_Aspect2
     {
-        [Advice(InjectionPoints.Before, InjectionTargets.Method)]
+        [Advice(Advice.Type.Before, Advice.Target.Method)]
         public void BeforeMethod()
         {
             Checker.Passed = false;
         }
     }
 
+    [Aspect(Aspect.Scope.Global)]
     internal class OrderTests_Aspect3
     {
-        [Advice(InjectionPoints.Before, InjectionTargets.Method)]
+        [Advice(Advice.Type.Before, Advice.Target.Method)]
         public void BeforeMethod()
         {
             Checker.Passed = true;

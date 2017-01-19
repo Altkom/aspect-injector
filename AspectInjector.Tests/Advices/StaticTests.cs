@@ -31,8 +31,8 @@ namespace AspectInjector.Tests.Advices
 
         public class StaticTests_AroundTarget
         {
-            [Aspect(typeof(StaticTests_AroundAspect1))]
-            [Aspect(typeof(StaticTests_AroundAspect2))] //fire first
+            [Inject(typeof(StaticTests_AroundAspect1))]
+            [Inject(typeof(StaticTests_AroundAspect2))] //fire first
             public static int Do123(int data, StringBuilder sb, object to, bool passed, bool passed2)
             {
                 Checker.Passed = passed && passed2;
@@ -43,27 +43,29 @@ namespace AspectInjector.Tests.Advices
             }
         }
 
+        [Aspect(Aspect.Scope.Global)]
         internal class StaticTests_AroundAspect1
         {
-            [Advice(InjectionPoints.Around, InjectionTargets.Method)]
-            public object AroundMethod([AdviceArgument(AdviceArgumentSource.Target)] Func<object[], object> target,
-                [AdviceArgument(AdviceArgumentSource.Arguments)] object[] arguments)
+            [Advice(Advice.Type.Around, Advice.Target.Method)]
+            public object AroundMethod([Advice.Argument(Advice.Argument.Source.Target)] Func<object[], object> target,
+                [Advice.Argument(Advice.Argument.Source.Arguments)] object[] arguments)
             {
                 return target(new object[] { arguments[0], arguments[1], arguments[2], true, arguments[4] });
             }
         }
 
+        [Aspect(Aspect.Scope.Global)]
         internal class StaticTests_AroundAspect2
         {
-            [Advice(InjectionPoints.Around, InjectionTargets.Method)]
-            public object AroundMethod([AdviceArgument(AdviceArgumentSource.Target)] Func<object[], object> target,
-                [AdviceArgument(AdviceArgumentSource.Arguments)] object[] arguments)
+            [Advice(Advice.Type.Around, Advice.Target.Method)]
+            public object AroundMethod([Advice.Argument(Advice.Argument.Source.Target)] Func<object[], object> target,
+                [Advice.Argument(Advice.Argument.Source.Arguments)] object[] arguments)
             {
                 return target(new object[] { arguments[0], arguments[1], arguments[2], arguments[3], true });
             }
         }
 
-        [Aspect(typeof(StaticTests_BeforeAspect))]
+        [Inject(typeof(StaticTests_BeforeAspect))]
         internal class StaticTests_BeforeTarget
         {
             public static void TestStaticMethod()
@@ -75,10 +77,11 @@ namespace AspectInjector.Tests.Advices
             }
         }
 
+        [Aspect(Aspect.Scope.Global)]
         internal class StaticTests_BeforeAspect
         {
             //Property
-            [Advice(InjectionPoints.Before, InjectionTargets.Method)]
+            [Advice(Advice.Type.Before, Advice.Target.Method)]
             public void BeforeMethod() { Checker.Passed = true; }
         }
     }

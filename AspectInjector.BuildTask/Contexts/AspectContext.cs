@@ -13,24 +13,15 @@ namespace AspectInjector.BuildTask.Contexts
         {
         }
 
-        public CustomAttribute[] AspectRoutableData { get; set; }
-
         public MethodDefinition AdviceClassFactory
         {
             get
             {
                 if (_adviceClassFactory == null)
                 {
-                    var aspectFactories = AdviceClassType.Methods.Where(m => m.IsStatic && !m.IsConstructor && m.CustomAttributes.HasAttributeOfType<AspectFactoryAttribute>()).ToList();
-
-                    if (aspectFactories.Any())
-                        _adviceClassFactory = aspectFactories[0];
-                    else
-                    {
-                        _adviceClassFactory = AdviceClassType.Methods
-                        .Where(c => c.IsConstructor && !c.IsStatic && !c.Parameters.Any())
-                        .FirstOrDefault();
-                    }
+                    _adviceClassFactory = AdviceClassType.Methods
+                    .Where(c => c.IsConstructor && !c.IsStatic && !c.Parameters.Any())
+                    .FirstOrDefault();
                 }
 
                 return _adviceClassFactory;
@@ -39,7 +30,7 @@ namespace AspectInjector.BuildTask.Contexts
 
         public TypeDefinition AdviceClassType { get; set; }
 
-        public AspectScope AdviceClassScope { get; set; }
+        public Aspect.Scope AdviceClassScope { get; set; }
 
         public TargetMethodContext TargetMethodContext { get; set; }
 

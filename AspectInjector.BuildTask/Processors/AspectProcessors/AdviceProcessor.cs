@@ -22,7 +22,7 @@ namespace AspectInjector.BuildTask.Processors.AspectProcessors
 
         public bool CanProcess(TypeDefinition aspectType)
         {
-            return aspectType.Methods.Any(m => m.CustomAttributes.HasAttributeOfType<AdviceAttribute>());
+            return aspectType.Methods.Any(m => m.CustomAttributes.HasAttributeOfType<Advice>());
         }
 
         public void Process(AspectContext context)
@@ -33,11 +33,11 @@ namespace AspectInjector.BuildTask.Processors.AspectProcessors
                 _injector.Inject(adviceContext);
         }
 
-        private static bool CheckTarget(TargetMethodContext targetMethodContext, InjectionTargets target)
+        private static bool CheckTarget(TargetMethodContext targetMethodContext, Advice.Target target)
         {
             var targetMethod = targetMethodContext.TargetMethod;
 
-            if (targetMethod.IsAbstract || 
+            if (targetMethod.IsAbstract ||
                 targetMethod.IsPInvokeImpl)
             {
                 return false;
@@ -45,32 +45,32 @@ namespace AspectInjector.BuildTask.Processors.AspectProcessors
 
             if (targetMethod.IsConstructor)
             {
-                return target == InjectionTargets.Constructor;
+                return target == Advice.Target.Constructor;
             }
 
             if (targetMethod.IsGetter)
             {
-                return target == InjectionTargets.Getter;
+                return target == Advice.Target.Getter;
             }
 
             if (targetMethod.IsSetter)
             {
-                return target == InjectionTargets.Setter;
+                return target == Advice.Target.Setter;
             }
 
             if (targetMethod.IsAddOn)
             {
-                return target == InjectionTargets.EventAdd;
+                return target == Advice.Target.EventAdd;
             }
 
             if (targetMethod.IsRemoveOn)
             {
-                return target == InjectionTargets.EventRemove;
+                return target == Advice.Target.EventRemove;
             }
 
             if (!targetMethod.CustomAttributes.HasAttributeOfType<CompilerGeneratedAttribute>())
             {
-                return target == InjectionTargets.Method;
+                return target == Advice.Target.Method;
             }
 
             return false;
@@ -80,17 +80,17 @@ namespace AspectInjector.BuildTask.Processors.AspectProcessors
         {
             Validator.ValidateAdviceClassType(adviceClassType);
 
-            return adviceClassType.Methods.Where(m => m.CustomAttributes.HasAttributeOfType<AdviceAttribute>());
+            return adviceClassType.Methods.Where(m => m.CustomAttributes.HasAttributeOfType<Advice>());
         }
 
-        private static IEnumerable<AdviceArgumentSource> GetAdviceArgumentsSources(MethodDefinition adviceMethod)
+        private static IEnumerable<Advice.Argument.Source> GetAdviceArgumentsSources(MethodDefinition adviceMethod)
         {
             foreach (var parameter in adviceMethod.Parameters)
             {
                 Validator.ValidateAdviceMethodParameter(parameter, adviceMethod);
 
-                var argumentAttribute = parameter.CustomAttributes.GetAttributeOfType<AdviceArgumentAttribute>();
-                var source = (AdviceArgumentSource)argumentAttribute.ConstructorArguments[0].Value;
+                var argumentAttribute = parameter.CustomAttributes.GetAttributeOfType<Advice.Argument>();
+                var source = (Advice.Argument.Source)argumentAttribute.ConstructorArguments[0].Value;
                 yield return source;
             }
         }
@@ -100,14 +100,14 @@ namespace AspectInjector.BuildTask.Processors.AspectProcessors
         {
             Validator.ValidateAdviceMethod(adviceMethod);
 
-            var adviceAttribute = adviceMethod.CustomAttributes.GetAttributeOfType<AdviceAttribute>();
+            var adviceAttribute = adviceMethod.CustomAttributes.GetAttributeOfType<Advice>();
 
-            var points = (InjectionPoints)adviceAttribute.ConstructorArguments[0].Value;
-            var targets = (InjectionTargets)adviceAttribute.ConstructorArguments[1].Value;
+            var points = (Advice.Type)adviceAttribute.ConstructorArguments[0].Value;
+            var targets = (Advice.Target)adviceAttribute.ConstructorArguments[1].Value;
 
-            foreach (InjectionPoints point in Enum.GetValues(typeof(InjectionPoints)).Cast<InjectionPoints>().Where(p => (points & p) != 0))
+            foreach (Advice.Type point in Enum.GetValues(typeof(Advice.Type)).Cast<Advice.Type>().Where(p => (points & p) != 0))
             {
-                foreach (InjectionTargets target in Enum.GetValues(typeof(InjectionTargets)).Cast<InjectionTargets>().Where(t => (targets & t) != 0))
+                foreach (Advice.Target target in Enum.GetValues(typeof(Advice.Target)).Cast<Advice.Target>().Where(t => (targets & t) != 0))
                 {
                     if (CheckTarget(parentContext.TargetMethodContext, target))
                     {

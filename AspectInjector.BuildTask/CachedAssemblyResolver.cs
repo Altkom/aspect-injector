@@ -20,7 +20,7 @@ namespace AspectInjector.BuildTask
         {
             _cacheFolder = cacheFolder;
             _strictResolver = new StrictAssemblyResolver();
-            _strictResolver.RegisterAssembly(typeof(AspectAttribute).Assembly.Location);
+            _strictResolver.RegisterAssembly(typeof(Inject).Assembly.Location);
         }
 
         public void RegisterAssembly(string assemblyPath)

@@ -9,11 +9,11 @@ namespace AspectInjector.BuildTask.Contexts
 {
     public class AdviceInjectionContext : IInjectionContext
     {
-        public List<AdviceArgumentSource> AdviceArgumentsSources { get; set; }
+        public List<Advice.Argument.Source> AdviceArgumentsSources { get; set; }
 
         public MethodDefinition AdviceMethod { get; set; }
 
-        public InjectionPoints InjectionPoint { get; set; }
+        public Advice.Type InjectionPoint { get; set; }
 
         public AspectContext AspectContext { get; set; }
     }

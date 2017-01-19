@@ -15,15 +15,14 @@ namespace AspectInjector.Tests.Advices
             {
                 t.Test();
             }
-            catch(Exception e)
+            catch (Exception e)
             {
                 Assert.Fail("No exception is expected, but got {0}", e);
             }
         }
     }
 
-
-    [Aspect(typeof(VirtualTests_Aspect))]
+    [Inject(typeof(VirtualTests_Aspect))]
     internal class VirtualTests_Base
     {
         public virtual void Test()
@@ -31,7 +30,7 @@ namespace AspectInjector.Tests.Advices
         }
     }
 
-    [Aspect(typeof(VirtualTests_Aspect))]
+    [Inject(typeof(VirtualTests_Aspect))]
     internal class VirtualTests_Inherited : VirtualTests_Base
     {
         public override void Test()
@@ -40,16 +39,17 @@ namespace AspectInjector.Tests.Advices
         }
     }
 
+    [Aspect(Aspect.Scope.Global)]
     internal class VirtualTests_Aspect
     {
         private int counter = 0;
 
-        [Advice(InjectionPoints.Around, InjectionTargets.Method)]
+        [Advice(Advice.Type.Around, Advice.Target.Method)]
         public object Trace(
-            [AdviceArgument(AdviceArgumentSource.Type)] Type type,
-            [AdviceArgument(AdviceArgumentSource.Name)] string methodName,
-            [AdviceArgument(AdviceArgumentSource.Target)] Func<object[], object> target,
-            [AdviceArgument(AdviceArgumentSource.Arguments)] object[] arguments)
+            [Advice.Argument(Advice.Argument.Source.Type)] Type type,
+            [Advice.Argument(Advice.Argument.Source.Name)] string methodName,
+            [Advice.Argument(Advice.Argument.Source.Target)] Func<object[], object> target,
+            [Advice.Argument(Advice.Argument.Source.Arguments)] object[] arguments)
         {
             if (counter > 0)
             {

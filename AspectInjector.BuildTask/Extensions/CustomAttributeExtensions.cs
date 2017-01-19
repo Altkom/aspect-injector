@@ -8,7 +8,7 @@ namespace AspectInjector.BuildTask.Extensions
     {
         public static bool IsAttributeOfType<T>(this CustomAttribute attribute)
         {
-            return attribute.AttributeType.Resolve().FullName == typeof(T).FullName;
+            return attribute.AttributeType.Resolve().FullName == typeof(T).FullName.Replace("+", "/");
         }
 
         public static bool HasAttributeOfType<T>(this IEnumerable<CustomAttribute> attributes)

@@ -26,6 +26,7 @@
     <DefineConstants>TRACE;DEBUG;CODE_ANALYSIS;ATTACH_DEBUGGER</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
+    <TreatWarningsAsErrors>false</TreatWarningsAsErrors>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
@@ -52,6 +53,10 @@
     </Reference>
     <Reference Include="Mono.Cecil.Rocks, Version=0.9.6.0, Culture=neutral, PublicKeyToken=0738eb9f132ed756, processorArchitecture=MSIL">
       <HintPath>..\packages\Mono.Cecil.0.9.6.4\lib\net45\Mono.Cecil.Rocks.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="Newtonsoft.Json, Version=9.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
+      <HintPath>..\packages\Newtonsoft.Json.9.0.1\lib\net45\Newtonsoft.Json.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="System" />
@@ -81,6 +86,9 @@
     <Compile Include="Injectors\AdviceInjector.cs" />
     <Compile Include="Injectors\InterfaceInjector.cs" />
     <Compile Include="Models\AspectDefinition.cs" />
+    <Compile Include="Models\Converters\TypeReferenceConverter.cs" />
+    <Compile Include="Models\FQN.cs" />
+    <Compile Include="Models\InjectionStatement.cs" />
     <Compile Include="Models\ExtendedTypeSystem.cs" />
     <Compile Include="Models\WrapperPointCut.cs" />
     <Compile Include="Models\AsyncPointCut.cs" />
@@ -100,6 +108,8 @@
     <Compile Include="Contracts\IModuleProcessor.cs" />
     <Compile Include="Processors\ModuleProcessors\Janitor.cs" />
     <Compile Include="Common\Markers.cs" />
+    <Compile Include="Processors\ModuleProcessors\MetadataWriterProcessor.cs" />
+    <Compile Include="Processors\ModuleProcessors\MetadataReaderProcessor.cs" />
     <Compile Include="Processors\ModuleProcessors\SnippetsProcessor.cs" />
     <Compile Include="Processors\AspectProcessors\AdviceProcessor.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
@@ -120,10 +130,6 @@
   </ItemGroup>
   <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
-  <Import Project="..\packages\BuildTools.StyleCop.4.7.49.0\tools\StyleCop.targets" Condition="Exists('..\packages\BuildTools.StyleCop.4.7.49.0\tools\StyleCop.targets')" />
-  <Target Name="___packages_BuildTools_StyleCop_4_7_49_0_tools_StyleCop_targets" Condition="$(StyleCopOutputFile)==''" BeforeTargets="BeforeBuild">
-    <Error Text="BuildTools_StyleCop - the BuildTools_StyleCop package has not been restored.&#xD;&#xA;If you are running this from an IDE, make sure NuGet Package Restore has been enabled, then reload the solution and re-run the build.&#xD;&#xA;If you are running this from the command line, run the build again.&#xD;&#xA;If this is a CI server, you may want to make sure NuGet Package Restore runs before your build with:&#xD;&#xA;	msbuild solution.sln /t:restorepackages" />
-  </Target>
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
   <Target Name="BeforeBuild">

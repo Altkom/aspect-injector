@@ -10,7 +10,7 @@ namespace AspectInjector.Tests.General
     {
     }
 
-    [Notify]
+    [Inject(typeof(NotifyPropertyChangedAspect))]
     public class AppViewModel
     {
         public string FirstName { get; set; }
@@ -26,32 +26,19 @@ namespace AspectInjector.Tests.General
         }
     }
 
-    [AspectDefinition(typeof(NotifyPropertyChangedAspect))]
-    internal class NotifyAttribute : Attribute
-    {
-        public string NotifyAlso { get; set; }
-    }
-
-    [AdviceInterfaceProxy(typeof(INotifyPropertyChanged))]
+    [Aspect(Aspect.Scope.Instance)]
+    [Mixin(typeof(INotifyPropertyChanged))]
     internal class NotifyPropertyChangedAspect : INotifyPropertyChanged
     {
         public event PropertyChangedEventHandler PropertyChanged = (s, e) => { };
 
-        [Advice(InjectionPoints.After, InjectionTargets.Setter)]
+        [Advice(Advice.Type.After, Advice.Target.Setter)]
         public void AfterSetter(
-            [AdviceArgument(AdviceArgumentSource.Instance)] object source,
-            [AdviceArgument(AdviceArgumentSource.Name)] string propName,
-            [AdviceArgument(AdviceArgumentSource.RoutableData)] Attribute[] data
+            [Advice.Argument(Advice.Argument.Source.Instance)] object source,
+            [Advice.Argument(Advice.Argument.Source.Name)] string propName
             )
         {
             PropertyChanged(source, new PropertyChangedEventArgs(propName));
-
-            var additionalPropName = (data[0] as NotifyAttribute).NotifyAlso;
-
-            if (!string.IsNullOrEmpty(additionalPropName))
-            {
-                PropertyChanged(source, new PropertyChangedEventArgs(additionalPropName));
-            }
         }
     }
 }

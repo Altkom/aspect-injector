@@ -75,8 +75,8 @@ namespace AspectInjector.Tests.Interfaces
             Assert.IsTrue(Checker.Passed);
         }
 
-        [Aspect(typeof(GeneralTests_Aspect))]
-        //[Aspect(typeof(INotifyPropertyChanged_Aspect))]
+        [Inject(typeof(GeneralTests_Aspect))]
+        //[Inject(typeof(INotifyPropertyChanged_Aspect))]
         internal class GeneralTests_Target
         {
             public GeneralTests_Target()
@@ -103,7 +103,8 @@ namespace AspectInjector.Tests.Interfaces
             public event PropertyChangedEventHandler PropertyChanged;
         }*/
 
-        [AdviceInterfaceProxy(typeof(IGeneralTests))]
+        [Mixin(typeof(IGeneralTests))]
+        [Aspect(Aspect.Scope.Global)]
         internal class GeneralTests_Aspect : IGeneralTests
         {
             string IGeneralTests.TestMethod(string data, int value, ref object testRef, out object testOut, ref int testRefValue, out int testOutValue)
