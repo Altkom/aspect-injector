@@ -12,18 +12,24 @@ using AspectInjector.BuildTask.Models;
 using AspectInjector.Core.Models;
 using AspectInjector.BuildTask.Extensions;
 using AspectInjector.Broker;
+using AspectInjector.Core.Advice;
 
 namespace AspectInjector.BuildTask.Processors.ModuleProcessors
 {
     internal class MetadataWriterProcessor : IModuleProcessor
     {
-        private readonly string _aspectCacheResourceName = "__a$_aspects";
+        internal const string _aspectCacheResourceName = "__a$_assets";
 
         public readonly List<string> _loadedMetadata = new List<string>();
 
         public void ProcessModule(ModuleDefinition module)
         {
             var aspects = module.Types.SelectMany(ReadAspects).ToList();
+
+            var assets = new Assets
+            {
+                Aspects = aspects
+            };
 
             var serializerSettings = new JsonSerializerSettings
             {
@@ -33,16 +39,16 @@ namespace AspectInjector.BuildTask.Processors.ModuleProcessors
                 TypeNameHandling = TypeNameHandling.Auto,
             };
 
-            //serializerSettings.Binder
-
             serializerSettings.Converters.Add(new TypeReferenceConverter(module));
+            serializerSettings.Converters.Add(new TypeDefinitionConverter(module));
+            serializerSettings.Converters.Add(new MethodDefinitionConverter(module));
 
             var resource = module.Resources.FirstOrDefault(r => r.ResourceType == ResourceType.Embedded && r.Name == _aspectCacheResourceName);
 
             if (resource != null)
                 module.Resources.Remove(resource);
 
-            var json = JsonConvert.SerializeObject(aspects, serializerSettings);
+            var json = JsonConvert.SerializeObject(assets, serializerSettings);
 
             resource = new EmbeddedResource(_aspectCacheResourceName, ManifestResourceAttributes.Private, Encoding.UTF8.GetBytes(json));
 
@@ -79,7 +85,7 @@ namespace AspectInjector.BuildTask.Processors.ModuleProcessors
             {
                 var aspectAttribute = type.CustomAttributes.GetAttributeOfType<Mixin>();
 
-                effects.Add(new AspectInjector.Core.Mixin.Mixin
+                effects.Add(new AspectInjector.Core.Mixin.MixinEffect
                 {
                     InterfaceType = (TypeReference)aspectAttribute.ConstructorArguments[0].Value
                 });
@@ -87,15 +93,16 @@ namespace AspectInjector.BuildTask.Processors.ModuleProcessors
 
             foreach (var method in type.Methods)
             {
-                if (method.CustomAttributes.HasAttributeOfType<Mixin>())
+                if (method.CustomAttributes.HasAttributeOfType<Advice>())
                 {
                     var aspectAttribute = method.CustomAttributes.GetAttributeOfType<Advice>();
 
-                    effects.Add(new AspectInjector.Core.Advice.Advice
+                    effects.Add(new AspectInjector.Core.Advice.AdviceEffect
                     {
                         Type = (Advice.Type)aspectAttribute.ConstructorArguments[0].Value,
                         Target = (Advice.Target)aspectAttribute.ConstructorArguments[1].Value,
-                        Args = ReadAdviceArgs(method)
+                        Params = ReadAdviceArgs(method),
+                        Method = method
                     });
                 }
             }
@@ -103,11 +110,11 @@ namespace AspectInjector.BuildTask.Processors.ModuleProcessors
             return effects;
         }
 
-        private List<Advice.Argument.Source> ReadAdviceArgs(MethodDefinition method)
+        private List<AdviceEffectParameter> ReadAdviceArgs(MethodDefinition method)
         {
-            var sources = method.Parameters.Select(p => (Advice.Argument.Source)p.CustomAttributes.Single(ca => ca.IsAttributeOfType<Advice.Argument>()).ConstructorArguments[0].Value).ToList();
+            var paramss = method.Parameters.Select(p => new AdviceEffectParameter { Source = (Advice.Argument.Source)p.CustomAttributes.Single(ca => ca.IsAttributeOfType<Advice.Argument>()).ConstructorArguments[0].Value, Index = p.Index }).ToList();
 
-            return sources;
+            return paramss;
         }
     }
 }

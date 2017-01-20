@@ -85,9 +85,11 @@
     <Compile Include="Extensions\TypeSystemExtensions.cs" />
     <Compile Include="Injectors\AdviceInjector.cs" />
     <Compile Include="Injectors\InterfaceInjector.cs" />
-    <Compile Include="Models\AspectDefinition.cs" />
+    <Compile Include="Models\Assets\AspectDefinition.cs" />
+    <Compile Include="Models\Converters\MethodDefinitionConverter.cs" />
+    <Compile Include="Models\Converters\TypeDefinitionConverter.cs" />
     <Compile Include="Models\Converters\TypeReferenceConverter.cs" />
-    <Compile Include="Models\FQN.cs" />
+    <Compile Include="Models\Assets\FQN.cs" />
     <Compile Include="Models\InjectionStatement.cs" />
     <Compile Include="Models\ExtendedTypeSystem.cs" />
     <Compile Include="Models\WrapperPointCut.cs" />

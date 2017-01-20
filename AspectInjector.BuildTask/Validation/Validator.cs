@@ -53,10 +53,10 @@ namespace AspectInjector.BuildTask.Validation
         internal static void ValidateAspectDefinitions(IEnumerable<InjectionStatement> allAspectDefinitions, TypeReference refer)
         {
             if (refer is GenericInstanceType)
-                throw new CompilationException($"Generic types as targets are not supported.", refer);
+                throw new CompilationException($"Generic types as targets are not supported {refer.FullName}.", refer);
 
             if (refer.HasGenericParameters)
-                throw new CompilationException($"Generic types as targets are not supported.", refer);
+                throw new CompilationException($"Generic types as targets are not supported {refer.FullName}.", refer);
 
             foreach (var injections in allAspectDefinitions)
                 if (!injections.AdviceClassType.CustomAttributes.HasAttributeOfType<Aspect>())
