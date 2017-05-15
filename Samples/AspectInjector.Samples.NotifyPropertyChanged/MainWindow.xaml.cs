@@ -1,6 +1,6 @@
 ﻿using System.Windows;
 
-namespace SampleApps.NotifyPropertyChanged
+namespace AspectInjector.Samples.NotifyPropertyChanged
 {
     public partial class MainWindow : Window
     {

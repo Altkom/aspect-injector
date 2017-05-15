@@ -6,7 +6,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using System.Windows;
 
-namespace SampleApps.NotifyPropertyChanged
+namespace AspectInjector.Samples.NotifyPropertyChanged
 {
     /// <summary>
     /// Interaction logic for App.xaml

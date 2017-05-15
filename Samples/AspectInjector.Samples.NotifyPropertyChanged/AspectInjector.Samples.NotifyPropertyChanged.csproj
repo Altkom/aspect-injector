@@ -1,6 +1,5 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="12.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
-  <Import Project="packages\AspectInjector.0.9.44\build\AspectInjector.props" Condition="Exists('packages\AspectInjector.0.9.44\build\AspectInjector.props')" />
   <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
@@ -8,8 +7,8 @@
     <ProjectGuid>{4867C72A-4799-4E1D-9120-330854484B69}</ProjectGuid>
     <OutputType>WinExe</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>SampleApps.NotifyPropertyChanged</RootNamespace>
-    <AssemblyName>SampleApps.NotifyPropertyChanged</AssemblyName>
+    <RootNamespace>AspectInjector.Samples.NotifyPropertyChanged</RootNamespace>
+    <AssemblyName>AspectInjector.Samples.NotifyPropertyChanged</AssemblyName>
     <TargetFrameworkVersion>v4.5.1</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <ProjectTypeGuids>{60dc8134-eba5-43b8-bcc9-bb4bc16c2548};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
@@ -38,9 +37,9 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="AspectInjector.Broker, Version=0.9.44.0, Culture=neutral, PublicKeyToken=a29e12442a3d3609, processorArchitecture=MSIL">
-      <HintPath>packages\AspectInjector.0.9.44\lib\AspectInjector.Broker.dll</HintPath>
-      <Private>False</Private>
+    <Reference Include="AspectInjector.Broker">
+      <HintPath>..\packages\AspectInjector.1.0.0-rc1\lib\netstandard1.0\AspectInjector.Broker.dll</HintPath>
+      <Private>True</Private>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Data" />
@@ -91,10 +90,9 @@
     <PropertyGroup>
       <ErrorText>This project references NuGet package(s) that are missing on this computer. Use NuGet Package Restore to download them.  For more information, see http://go.microsoft.com/fwlink/?LinkID=322105. The missing file is {0}.</ErrorText>
     </PropertyGroup>
-    <Error Condition="!Exists('packages\AspectInjector.0.9.44\build\AspectInjector.props')" Text="$([System.String]::Format('$(ErrorText)', 'packages\AspectInjector.0.9.44\build\AspectInjector.props'))" />
-    <Error Condition="!Exists('packages\AspectInjector.0.9.44\build\AspectInjector.targets')" Text="$([System.String]::Format('$(ErrorText)', 'packages\AspectInjector.0.9.44\build\AspectInjector.targets'))" />
+    <Error Condition="!Exists('..\packages\AspectInjector.1.0.0-rc1\build\AspectInjector.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\AspectInjector.1.0.0-rc1\build\AspectInjector.targets'))" />
   </Target>
-  <Import Project="packages\AspectInjector.0.9.44\build\AspectInjector.targets" Condition="Exists('packages\AspectInjector.0.9.44\build\AspectInjector.targets')" />
+  <Import Project="..\packages\AspectInjector.1.0.0-rc1\build\AspectInjector.targets" Condition="Exists('..\packages\AspectInjector.1.0.0-rc1\build\AspectInjector.targets')" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
   <Target Name="BeforeBuild">

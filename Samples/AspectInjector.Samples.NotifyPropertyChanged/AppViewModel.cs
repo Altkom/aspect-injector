@@ -1,5 +1,6 @@
-﻿using SampleApps.NotifyPropertyChanged.Aspects;
-namespace SampleApps.NotifyPropertyChanged
+﻿using AspectInjector.Samples.NotifyPropertyChanged.Aspects;
+
+namespace AspectInjector.Samples.NotifyPropertyChanged
 {
     
     public class AppViewModel

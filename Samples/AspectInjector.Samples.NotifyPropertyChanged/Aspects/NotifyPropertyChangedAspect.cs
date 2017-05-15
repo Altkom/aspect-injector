@@ -2,7 +2,7 @@
 using System;
 using System.ComponentModel;
 
-namespace SampleApps.NotifyPropertyChanged.Aspects
+namespace AspectInjector.Samples.NotifyPropertyChanged.Aspects
 {
     [CustomAspectDefinition(typeof(NotifyPropertyChangedAspect))]
     class NotifyAttribute : Attribute
@@ -11,17 +11,16 @@ namespace SampleApps.NotifyPropertyChanged.Aspects
     }
 
 
-    [AdviceInterfaceProxy(typeof(INotifyPropertyChanged))]
+    [Mixin(typeof(INotifyPropertyChanged))]
     class NotifyPropertyChangedAspect : INotifyPropertyChanged
     {
         public event PropertyChangedEventHandler PropertyChanged = (s, e) => { };
 
-        [Advice(InjectionPoints.After, InjectionTargets.Setter)]
+        [Advice(Advice.Type.After, Advice.Target.Setter)]
         public void AfterSetter(
-            [AdviceArgument(AdviceArgumentSource.Instance)] object source,
-            [AdviceArgument(AdviceArgumentSource.TargetName)] string propName,
-            [AdviceArgument(AdviceArgumentSource.RoutableData)] object data
-            )
+            [Advice.Argument(Advice.Argument.Source.Instance)] object source,
+            [Advice.Argument(Advice.Argument.Source.Name)] string propName,
+            [Advice.Argument(Advice.Argument.Source.)] object data)
         {
             PropertyChanged(source, new PropertyChangedEventArgs(propName));
 
