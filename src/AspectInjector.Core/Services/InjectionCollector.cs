@@ -59,9 +59,17 @@ namespace AspectInjector.Core.Services
 
         protected virtual IEnumerable<Injection> ExtractInjectionsFromClass(TypeDefinition target)
         {
-            var injections = Enumerable.Empty<Injection>();
+            var injections = ExtractInjections(target);
 
-            foreach (var attr in GetBaseTypes(target).SelectMany(p=>p.CustomAttributes.Where(a => a.AttributeType.IsTypeOf(typeof(Broker.Inject)))).ToList())
+            var inheritedAttributes = GetBaseTypes(target.BaseType as TypeDefinition).SelectMany(p => p.CustomAttributes);
+
+            inheritedAttributes = inheritedAttributes.Where(a => 
+                a.AttributeType.IsTypeOf(typeof(Broker.Inject)) && 
+                a.GetType().CustomAttributes.OfType<AttributeUsageAttribute>()
+                .Any(au => au.Inherited)
+            );
+
+            foreach (var attr in inheritedAttributes.ToList())
             {
                 injections = injections.Concat(ParseInjectionAttribute(target, attr));
                 target.CustomAttributes.Remove(attr);
@@ -75,7 +83,7 @@ namespace AspectInjector.Core.Services
             if (target == null) yield break;
             yield return target;
 
-            if(target.BaseType != null)
+            if (target.BaseType != null)
             {
                 foreach (var item in GetBaseTypes(target.BaseType as TypeDefinition))
                 {
