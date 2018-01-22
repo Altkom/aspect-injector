@@ -25,11 +25,17 @@ namespace AspectInjector.Core.Services
 
             foreach (var module in assembly.Modules)
             {
+                var types = module.GetTypes();
+                foreach (var type in types)
+                {
+                    AddAttributesFromBaseClass(type);
+                }
+
                 aspects = aspects.Concat(ExtractInjections(module));
 
-                foreach (var type in module.GetTypes())
+                foreach (var type in types)
                 {
-                    aspects = aspects.Concat(ExtractInjectionsFromClass(type));
+                    aspects = aspects.Concat(ExtractInjections(type));
 
                     aspects = aspects.Concat(type.Events.SelectMany(ExtractInjections));
                     aspects = aspects.Concat(type.Properties.SelectMany(ExtractInjections));
@@ -57,25 +63,23 @@ namespace AspectInjector.Core.Services
         }
 
 
-        protected virtual IEnumerable<Injection> ExtractInjectionsFromClass(TypeDefinition target)
+        protected void AddAttributesFromBaseClass(TypeDefinition target)
         {
-            var injections = ExtractInjections(target);
-
             var inheritedAttributes = GetBaseTypes(target.BaseType as TypeDefinition).SelectMany(p => p.CustomAttributes);
 
-            inheritedAttributes = inheritedAttributes.Where(a => 
-                a.AttributeType.IsTypeOf(typeof(Broker.Inject)) && 
+            inheritedAttributes = inheritedAttributes.Where(a =>
+                a.AttributeType.IsTypeOf(typeof(Broker.Inject)) &&
                 a.GetType().CustomAttributes.OfType<AttributeUsageAttribute>()
                 .Any(au => au.Inherited)
             );
 
             foreach (var attr in inheritedAttributes.ToList())
             {
-                injections = injections.Concat(ParseInjectionAttribute(target, attr));
-                target.CustomAttributes.Remove(attr);
+                if(!target.CustomAttributes.Contains(attr))
+                {
+                    target.CustomAttributes.Add(attr);
+                }
             }
-
-            return injections;
         }
 
         private IEnumerable<TypeDefinition> GetBaseTypes(TypeDefinition target)
