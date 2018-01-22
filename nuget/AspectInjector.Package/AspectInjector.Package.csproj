@@ -8,9 +8,9 @@
     <Company>AspectInjector Team</Company>
     <Description>This library provides attributes-based compile-time AOP framework.</Description>
     <Authors>Yuriy Ivon,  Alexander Guly</Authors>
-    <PackageProjectUrl>https://github.com/pamidur/aspect-injector</PackageProjectUrl>
+    <PackageProjectUrl>https://github.com/Altkom/aspect-injector</PackageProjectUrl>
     <PackageIconUrl>https://raw.githubusercontent.com/pamidur/aspect-injector/master/package.png</PackageIconUrl>
-    <RepositoryUrl>https://github.com/pamidur/aspect-injector</RepositoryUrl>
+    <RepositoryUrl>https://github.com/Altkom/aspect-injector</RepositoryUrl>
     <RepositoryType>git</RepositoryType>
     <PackageTags>AOP aspect aspects injector injection wp8 wp8.1 win8 win8.1 win10 dotnet core notify notifypropertychanged INPC</PackageTags>
     <GeneratePackageOnBuild>True</GeneratePackageOnBuild>

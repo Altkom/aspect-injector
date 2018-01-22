@@ -29,7 +29,7 @@ namespace AspectInjector.Core.Services
 
                 foreach (var type in module.GetTypes())
                 {
-                    aspects = aspects.Concat(ExtractInjections(type));
+                    aspects = aspects.Concat(ExtractInjectionsFromClass(type));
 
                     aspects = aspects.Concat(type.Events.SelectMany(ExtractInjections));
                     aspects = aspects.Concat(type.Properties.SelectMany(ExtractInjections));
@@ -55,6 +55,36 @@ namespace AspectInjector.Core.Services
 
             return injections;
         }
+
+
+        protected virtual IEnumerable<Injection> ExtractInjectionsFromClass(TypeDefinition target)
+        {
+            var injections = Enumerable.Empty<Injection>();
+
+            foreach (var attr in GetBaseTypes(target).SelectMany(p=>p.CustomAttributes.Where(a => a.AttributeType.IsTypeOf(typeof(Broker.Inject)))).ToList())
+            {
+                injections = injections.Concat(ParseInjectionAttribute(target, attr));
+                target.CustomAttributes.Remove(attr);
+            }
+
+            return injections;
+        }
+
+        private IEnumerable<TypeDefinition> GetBaseTypes(TypeDefinition target)
+        {
+            if (target == null) yield break;
+            yield return target;
+
+            if(target.BaseType != null)
+            {
+                foreach (var item in GetBaseTypes(target.BaseType as TypeDefinition))
+                {
+                    yield return item;
+                }
+            }
+        }
+
+
 
         private IEnumerable<Injection> ParseInjectionAttribute(ICustomAttributeProvider target, CustomAttribute attr)
         {
