@@ -33,7 +33,7 @@ namespace AspectInjector.Core.Services
 
                 aspects = aspects.Concat(ExtractInjections(module));
 
-                foreach (var type in types)
+                foreach (var type in module.GetTypes())
                 {
                     aspects = aspects.Concat(ExtractInjections(type));
 
@@ -68,9 +68,7 @@ namespace AspectInjector.Core.Services
             var inheritedAttributes = GetBaseTypes(target.BaseType as TypeDefinition).SelectMany(p => p.CustomAttributes);
 
             inheritedAttributes = inheritedAttributes.Where(a =>
-                a.AttributeType.IsTypeOf(typeof(Broker.Inject)) &&
-                a.GetType().CustomAttributes.OfType<AttributeUsageAttribute>()
-                .Any(au => au.Inherited)
+                a.AttributeType.IsTypeOf(typeof(Broker.Inject))
             );
 
             foreach (var attr in inheritedAttributes.ToList())

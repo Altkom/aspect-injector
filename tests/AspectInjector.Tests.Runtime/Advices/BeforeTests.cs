@@ -8,11 +8,13 @@ namespace AspectInjector.Tests.Advices
     public class BeforeTests
     {
         private BeforeTests_Target _beforeTestClass;
+        private BeforeTests_Target1 _beforeTestClass1;
 
         [TestInitialize]
         public void SetUp()
         {
             _beforeTestClass = new BeforeTests_Target();
+            _beforeTestClass1 = new BeforeTests_Target1();
         }
 
         [TestMethod]
@@ -29,6 +31,17 @@ namespace AspectInjector.Tests.Advices
             Checker.Passed = false;
 
             _beforeTestClass.TestProperty = 1;
+            Assert.IsTrue(Checker.Passed);
+        }
+
+        [TestMethod]
+        public void Advices_InjectBeforeSetter_Base()
+        {
+            Checker.Passed = false;
+            _beforeTestClass1.TestProperty = 1;
+            _beforeTestClass1.TestProperty1 = 1;
+            var a = typeof(BeforeTests_Target).GetCustomAttributes(false);
+            var b = typeof(BeforeTests_Target1).GetCustomAttributes(false);
             Assert.IsTrue(Checker.Passed);
         }
 
@@ -114,6 +127,12 @@ namespace AspectInjector.Tests.Advices
         public event EventHandler<EventArgs> TestEvent = (s, e) => { };
 
         public int TestProperty { get; set; }
+    }
+
+    internal class BeforeTests_Target1 : BeforeTests_Target
+    {
+
+        public int TestProperty1 { get; set; }
     }
 
     //aspects
