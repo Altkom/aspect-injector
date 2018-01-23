@@ -25,6 +25,12 @@ namespace AspectInjector.Core.Services
 
             foreach (var module in assembly.Modules)
             {
+                var types = module.GetTypes();
+                foreach (var type in types)
+                {
+                    AddAttributesFromBaseClass(type);
+                }
+
                 aspects = aspects.Concat(ExtractInjections(module));
 
                 foreach (var type in module.GetTypes())
@@ -41,6 +47,37 @@ namespace AspectInjector.Core.Services
             aspects = aspects.GroupBy(a => a).Select(g => g.Aggregate(MergeInjections)).ToList();
 
             return aspects.ToList();
+        }
+
+        protected void AddAttributesFromBaseClass(TypeDefinition target)
+        {
+            var inheritedAttributes = GetBaseTypes(target.BaseType as TypeDefinition).SelectMany(p => p.CustomAttributes);
+
+            inheritedAttributes = inheritedAttributes.Where(a =>
+                a.AttributeType.IsTypeOf(typeof(Broker.Inject))
+            );
+
+            foreach (var attr in inheritedAttributes.ToList())
+            {
+                if (!target.CustomAttributes.Contains(attr))
+                {
+                    target.CustomAttributes.Add(attr);
+                }
+            }
+        }
+
+        private IEnumerable<TypeDefinition> GetBaseTypes(TypeDefinition target)
+        {
+            if (target == null) yield break;
+            yield return target;
+
+            if (target.BaseType != null)
+            {
+                foreach (var item in GetBaseTypes(target.BaseType as TypeDefinition))
+                {
+                    yield return item;
+                }
+            }
         }
 
         protected virtual IEnumerable<Injection> ExtractInjections(ICustomAttributeProvider target)
@@ -76,20 +113,6 @@ namespace AspectInjector.Core.Services
             }
 
             return injections;
-        }
-
-        private IEnumerable<TypeDefinition> GetBaseTypes(TypeDefinition target)
-        {
-            if (target == null) yield break;
-            yield return target;
-
-            if (target.BaseType != null)
-            {
-                foreach (var item in GetBaseTypes(target.BaseType as TypeDefinition))
-                {
-                    yield return item;
-                }
-            }
         }
 
 
